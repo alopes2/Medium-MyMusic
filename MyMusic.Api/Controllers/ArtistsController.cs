@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -70,38 +69,30 @@ namespace MyMusic.Api.Controllers
             if (!validationResult.IsValid)
                 return BadRequest(validationResult.Errors); // this needs refining, but for demo it is ok
 
+            var artistToBeUpdated = await _artistService.GetArtistById(id);
+
+            if (artistToBeUpdated == null)
+                return NotFound();
+
             var artist = _mapper.Map<SaveArtistResource, Artist>(saveArtistResource);
 
-            try
-            {
-                var updatedArtist = await _artistService.UpdateArtist(id, artist);
+            await _artistService.UpdateArtist(artistToBeUpdated, artist);
 
-                var updatedArtistResource = _mapper.Map<Artist, ArtistResource>(updatedArtist);
+            var updatedArtist = await _artistService.GetArtistById(id);
 
-                return Ok(updatedArtistResource);
-            }
-            catch(Exception e)
-            {
-                // We can catch many errors here, but for this demo we are just considering that the record was not found
-                return NotFound();
-            }
+            var updatedArtistResource = _mapper.Map<Artist, ArtistResource>(updatedArtist);
+
+            return Ok(updatedArtistResource);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteArtist(int id)
         {
-            try
-            {
-                await _artistService.DeleteArtist(id);
-                
-                return NoContent();
-            }
-            catch(Exception e)
-            {
-                // We can catch many errors here, but for this demo we are just considering that the record was not found
-                return NotFound();
-            }
+            var artist = await _artistService.GetArtistById(id);
 
+            await _artistService.DeleteArtist(artist);
+            
+            return NoContent();
         }
     }
 }

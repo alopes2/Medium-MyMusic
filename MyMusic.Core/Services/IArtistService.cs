@@ -9,7 +9,7 @@ namespace MyMusic.Core.Services
         Task<IEnumerable<Artist>> GetAllArtists();
         Task<Artist> GetArtistById(int id);
         Task<Artist> CreateArtist(Artist newArtist);
-        Task<Artist> UpdateArtist(int id, Artist artist);
-        Task DeleteArtist(int id);
+        Task UpdateArtist(Artist artistToBeUpdated, Artist artist);
+        Task DeleteArtist(Artist artist);
     }
 }

@@ -67,40 +67,40 @@ namespace MyMusic.Api.Controllers
             var validator = new SaveMusicResourceValidator();
             var validationResult = await validator.ValidateAsync(saveMusicResource);
             
-            if (!validationResult.IsValid)
+            var requestIsInvalid = id == 0 || !validationResult.IsValid;
+
+            if (requestIsInvalid)
                 return BadRequest(validationResult.Errors); // this needs refining, but for demo it is ok
+            
+            var musicToBeUpdate = await _musicService.GetMusicById(id);
+
+            if (musicToBeUpdate == null)
+                return NotFound();
 
             var music = _mapper.Map<SaveMusicResource, Music>(saveMusicResource);
 
-            try
-            {
-                var updatedMusic = await _musicService.UpdateMusic(id, music);
+            await _musicService.UpdateMusic(musicToBeUpdate, music);
 
-                var updatedMusicResource = _mapper.Map<Music, MusicResource>(updatedMusic);
+            var updatedMusic = await _musicService.GetMusicById(id);
+            var updatedMusicResource = _mapper.Map<Music, MusicResource>(updatedMusic);
     
-                return Ok(updatedMusicResource);
-            }
-            catch(Exception e)
-            {
-                // We can catch many errors here, but for this demo we are just considering that the record was not found
-                return NotFound();
-            }
+            return Ok(updatedMusicResource);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMusic(int id)
         {
-            try
-            {
-                await _musicService.DeleteMusic(id);
+            if (id == 0)
+                return BadRequest();
+            
+            var music = await _musicService.GetMusicById(id);
 
-                return NoContent();
-            }
-            catch(Exception e)
-            {
-                // We can catch many errors here, but for this demo we are just considering that the record was not found
+            if (music == null)
                 return NotFound();
-            }
+
+            await _musicService.DeleteMusic(music);
+
+            return NoContent();
         }
     }
 }

@@ -12,10 +12,6 @@ namespace MyMusic.Data.Repositories
         public MusicRepository(MyMusicDbContext context) 
             : base(context)
         { }
-        private MyMusicDbContext MyMusicDbContext
-        {
-            get { return Context as MyMusicDbContext; }
-        }
 
         public async Task<IEnumerable<Music>> GetAllWithArtistAsync()
         {
@@ -37,6 +33,11 @@ namespace MyMusic.Data.Repositories
                 .Include(m => m.Artist)
                 .Where(m => m.ArtistId == artistId)
                 .ToListAsync();
+        }
+        
+        private MyMusicDbContext MyMusicDbContext
+        {
+            get { return Context as MyMusicDbContext; }
         }
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MyMusic.Core;
@@ -22,14 +21,9 @@ namespace MyMusic.Services
             return newMusic;
         }
 
-        public async Task DeleteMusic(int id)
+        public async Task DeleteMusic(Music music)
         {
-            var musicToBeDeleted = await _unitOfWork.Musics.GetByIdAsync(id);
-
-            if (musicToBeDeleted == null)
-                throw new Exception(); // We're using this for demo purposes, but is better to have custom exceptions for this case or work with the Result pattern
-
-            _unitOfWork.Musics.Remove(musicToBeDeleted);
+            _unitOfWork.Musics.Remove(music);
             await _unitOfWork.CommitAsync();
         }
 
@@ -51,19 +45,12 @@ namespace MyMusic.Services
                 .GetAllWithArtistByArtistIdAsync(artistId);
         }
 
-        public async Task<Music> UpdateMusic(int id, Music music)
+        public async Task UpdateMusic(Music musicToBeUpdated, Music music)
         {
-            var updatedMusic = await _unitOfWork.Musics.GetByIdAsync(id);
-
-            if (updatedMusic == null)
-                throw new Exception(); // We're using this for demo purposes, but is better to have custom exceptions for this case or work with the Result pattern
-
-            updatedMusic.Name = music.Name;
-            updatedMusic.ArtistId = music.ArtistId;
+            musicToBeUpdated.Name = music.Name;
+            musicToBeUpdated.ArtistId = music.ArtistId;
 
             await _unitOfWork.CommitAsync();
-
-            return updatedMusic;
         }
     }
 }

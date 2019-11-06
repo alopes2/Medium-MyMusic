@@ -36,7 +36,7 @@ namespace MyMusic.Data.Repositories
             return  await Context.Set<TEntity>().ToListAsync();
         }
 
-        public Task<TEntity> GetByIdAsync(int id)
+        public ValueTask<TEntity> GetByIdAsync(int id)
         {
             return Context.Set<TEntity>().FindAsync(id);
         }
